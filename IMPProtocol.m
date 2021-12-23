@@ -54,6 +54,8 @@ void protocol_add_default_class_method(Protocol *proto, Class protoCls, Class cl
     @param  protoCls        proto协议默认方法的类
  */
 void protocol_find_conformed_class(Protocol *proto, Class protoCls) {
+    static NSTimeInterval cost = 0;
+    NSDate *date1 = [NSDate date];
     unsigned int count = 0;
     Class *classes = objc_copyClassList(&count);
     for (int i = 0; i < count; i++) {
@@ -66,6 +68,9 @@ void protocol_find_conformed_class(Protocol *proto, Class protoCls) {
             protocol_add_default_class_method(proto, protoCls, cls);
         }
     }
+    NSDate *date2 = [NSDate date];
+    cost += [date2 timeIntervalSinceDate:date1];
+    NSLog(@">>> IMProtocol cost: %fs", cost);
     free(classes);
 }
 

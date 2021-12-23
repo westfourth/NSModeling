@@ -5,13 +5,24 @@
 
 ## 为啥重复造轮子
 
-对比 [Mantle](https://github.com/Mantle/Mantle)、[jsonmodel](https://github.com/jsonmodel/jsonmodel)、[MJExtension](https://github.com/CoderMJLee/MJExtension) 特点：
+对比 [Mantle](https://github.com/Mantle/Mantle)、[jsonmodel](https://github.com/jsonmodel/jsonmodel)、[MJExtension](https://github.com/CoderMJLee/MJExtension)、[NSModeling](https://github.com/westfourth/NSModeling) 特点：
 
-| 库 | 优点 | 缺点 | 
-| :-: | --- | --- |
-| [Mantle](https://github.com/Mantle/Mantle) | 1. 非常规范，适合高级开发者<br> 2. 支持`property`映射<br> 3. 支持属性`Transformer` 转换<br> 4. 可以指定嵌套模型的类型 | 1. 初中级开发者上手难<br> 2. 没处理好易崩溃<br> 3. 难以调试<br> 4. 使用继承方式实现 |
-| [jsonmodel](https://github.com/jsonmodel/jsonmodel) | 1. 方法简明<br> 2. 使用伪`protocol`指定嵌套模型类型<br> 3. 支持`property`映射<br> 4. 对象属性支持`Optional`、`Ignore`<br> 5. 支持属性`Transformer` 转换<br> 6. 自定义`getter`、`setter` | 1. 使用继承方式实现 |
-| [MJExtension](https://github.com/CoderMJLee/MJExtension) | 1. 支持`property`映射<br> 2. 可以指定嵌套模型的类型 | 1. 方法名怪异<br> 2. 使用`Category`方式实现，易造成方法冲突 |
+|  | [MJExtension](https://github.com/CoderMJLee/MJExtension) | [jsonmodel](https://github.com/jsonmodel/jsonmodel) | [Mantle](https://github.com/Mantle/Mantle) | [NSModeling](https://github.com/westfourth/NSModeling) |
+| :-: | :-: | :-: | :-: | :-: |
+| **使用方式** | 分类 | 继承 | 继承 | 协议 |
+| **适用性** | - | - | 高级开发者 | - |
+| **规范性** | - | - | 非常规范 | - |
+| **严格性** | - | - | 数据类型严格 | - |
+| **调试性** | - | - | 不易调试 | - |
+| **方法名** | 晦涩 | 简明 | 一般 | 非常简明 |
+| **嵌套模型** | 直接转换 | 直接转换 | 指明子模型类 | 直接转换 |
+| **嵌套数组** | 字典指明类型 | 伪协议指明类型 | 方法指明类型 | 伪协议指明类型 |
+| **属性映射** | 可选 | 可选 | 必须 | 可选 |
+| **忽略属性** | 不支持 | 支持 | 不支持 | 支持 |
+| **Ignore、Optional** | 不支持 | 支持 | 不支持 | 不支持 |
+| **transformer** | 不支持 | 不支持 | 支持 | 不支持 |
+| **getter、setter** | 不支持 | 支持 | 不支持 | 支持 |
+
 
 ## 举例
 
@@ -128,7 +139,11 @@
 @end
 ```
 
+[Mantle](https://github.com/Mantle/Mantle)、[jsonmodel](https://github.com/jsonmodel/jsonmodel)、[MJExtension](https://github.com/CoderMJLee/MJExtension) 都支持多级属性映射（`valueForKeyPath:`），[NSModeling](https://github.com/westfourth/NSModeling) 特意去掉多级属性映射（`valueForKey:`）。**原因是在实际开发过程中，多级属性映射易造成模型混乱**，去掉多级属性映射，让模型跟后台接口数据结构保持一致。
+
 ## 自定义getter、setter
+
+![method_sequence](method_sequence.png)
 
 ``` objc
 @implementation TestObject

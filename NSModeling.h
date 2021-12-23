@@ -35,7 +35,10 @@ NS_ASSUME_NONNULL_BEGIN
 @optional
 
 /// 转换映射
-+ (nullable NSDictionary *)dictMapper;
++ (nullable NSDictionary<NSString *, NSString *> *)propertyMapper;
+
+/// 忽略属性
++ (nullable NSArray<NSString *> *)ignoreProperties;
 
 /// NSNull => nil 自动转。
 + (BOOL)automaticNil;
@@ -45,6 +48,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// NSString <=> NSDate 自动互转。
 + (BOOL)automaticDate;
+
+/// 时间格式化
++ (NSDateFormatter *)dateFormatter;
 
 @end
 

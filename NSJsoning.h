@@ -20,7 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)fromJsonString:(NSString *)string;
 
-- (instancetype)fromJsonFile:(NSString *)filename inBundle:(nullable NSBundle *)bundle;
+- (instancetype)fromJsonFilename:(NSString *)filename bundle:(nullable NSBundle *)bundle;
 
 
 //MARK: -   数组
@@ -33,7 +33,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (nullable NSArray *)fromJsonString:(NSString *)string;
 
-+ (nullable NSArray *)fromJsonFile:(NSString *)filename inBundle:(nullable NSBundle *)bundle;
++ (nullable NSArray *)fromJsonFilename:(NSString *)filename bundle:(nullable NSBundle *)bundle;
 
 @end
 

@@ -19,8 +19,8 @@ static id from_dict_value(id self, const char *name, Class cls, id value);
 static NSString *dict_key(id self, NSString *key);
 static SEL model_sel(const char *name, char *type);
 static char *str_sub(const char *s, char start, char end);
-Class property_get_array_class(objc_property_t prop);
-Class property_get_object_class(objc_property_t prop);
+Class property_get_protocol_class(objc_property_t prop);
+Class property_get_property_class(objc_property_t prop);
 
 
 //MARK: -   NSModeling
@@ -38,17 +38,21 @@ Class property_get_object_class(objc_property_t prop);
         if (property_is_readonly(prop)) {
             continue;
         }
-
-        Class cls = property_get_object_class(prop);
-        const char *name = property_getName(prop);
-        NSString *key = [NSString stringWithUTF8String:name];
-        NSString *dictKey = dict_key(self, key);
         
+        const char *name = property_getName(prop);
+        NSString *key = @(name);
+        if ([[self class] respondsToSelector:@selector(ignoreProperties)] &&
+            [[[self class] ignoreProperties] containsObject:key]) {
+            continue;
+        }
+        
+        NSString *dictKey = dict_key(self, key);
         NSObject *value = [self valueForKey:key];
+        Class cls = property_get_property_class(prop);
         value = to_dict_value(self, name, cls, value);
         
         if ([value isKindOfClass:[NSArray class]]) {
-            cls = property_get_array_class(prop);
+            cls = property_get_protocol_class(prop);
             if (class_conformsToProtocol(cls, @protocol(NSModeling))) {
                 value = [cls toDict:(NSArray *)value];
             }
@@ -72,16 +76,20 @@ Class property_get_object_class(objc_property_t prop);
             continue;
         }
 
-        Class cls = property_get_object_class(prop);
         const char *name = property_getName(prop);
-        NSString *key = [NSString stringWithUTF8String:name];
-        NSString *dictKey = dict_key(self, key);
+        NSString *key = @(name);
+        if ([[self class] respondsToSelector:@selector(ignoreProperties)] &&
+            [[[self class] ignoreProperties] containsObject:key]) {
+            continue;
+        }
         
+        NSString *dictKey = dict_key(self, key);
         NSObject *value = dict[dictKey];
+        Class cls = property_get_property_class(prop);
         value = from_dict_value(self, name, cls, value);
         
         if ([value isKindOfClass:[NSArray class]]) {
-            cls = property_get_array_class(prop);
+            cls = property_get_protocol_class(prop);
             if (class_conformsToProtocol(cls, @protocol(NSModeling))) {
                 value = [cls fromDict:(NSArray *)value];
             }
@@ -164,13 +172,17 @@ static id to_dict_value(id self, const char *name, Class cls, id value) {
                 value = [(NSURL *)value absoluteString];
             }
         } else if (cls == [NSDate class]) {     //  NSDate处理
+            NSDateFormatter *df = NSModelConfig.share.dateFormatter;
+            if ([[self class] respondsToSelector:@selector(dateFormatter)]) {
+                df = [[self class] dateFormatter];
+            }
             if ([[self class] respondsToSelector:@selector(automaticDate)]) {
                 BOOL flag = [[self class] automaticDate];
                 if (flag) {
-                    value = [NSModelConfig.share.dateFormatter stringFromDate:(NSDate *)value];
+                    value = [df stringFromDate:(NSDate *)value];
                 }
             } else if (NSModelConfig.share.automaticDate) {
-                value = [NSModelConfig.share.dateFormatter stringFromDate:(NSDate *)value];
+                value = [df stringFromDate:(NSDate *)value];
             }
         }
     }
@@ -214,13 +226,17 @@ static id from_dict_value(id self, const char *name, Class cls, id value) {
                 value = [NSURL URLWithString:(NSString *)value];
             }
         } else if (cls == [NSDate class]) {     //  NSDate处理
+            NSDateFormatter *df = NSModelConfig.share.dateFormatter;
+            if ([[self class] respondsToSelector:@selector(dateFormatter)]) {
+                df = [[self class] dateFormatter];
+            }
             if ([[self class] respondsToSelector:@selector(automaticDate)]) {
                 BOOL flag = [[self class] automaticDate];
                 if (flag) {
-                    value = [NSModelConfig.share.dateFormatter dateFromString:(NSString *)value];
+                    value = [df dateFromString:(NSString *)value];
                 }
             } else if (NSModelConfig.share.automaticDate) {
-                value = [NSModelConfig.share.dateFormatter dateFromString:(NSString *)value];
+                value = [df dateFromString:(NSString *)value];
             }
         }
     }
@@ -230,8 +246,8 @@ static id from_dict_value(id self, const char *name, Class cls, id value) {
 static NSString *dict_key(id self, NSString *key) {
     NSString *dictKey = key;
     //  取dictKey
-    if ([[self class] respondsToSelector:@selector(dictMapper)]) {
-        NSDictionary *map = [[self class] dictMapper];
+    if ([[self class] respondsToSelector:@selector(propertyMapper)]) {
+        NSDictionary *map = [[self class] propertyMapper];
         NSString *tmp = map[key];
         if (tmp) {
             dictKey = tmp;
@@ -289,7 +305,7 @@ static char *str_sub(const char *s, char start, char end) {
 /**
     获取 @property (nonatomic) NSArray<SubTestObject *> <SubTestObject> *list; 结果为：<SubTestObject>中的 \c SubTestObject
  */
-Class property_get_array_class(objc_property_t prop) {
+Class property_get_protocol_class(objc_property_t prop) {
     const char *v = property_copyAttributeValue(prop, "T");
     char *sub = str_sub(v, '<', '>');
     Class cls = objc_getClass(sub);
@@ -300,7 +316,7 @@ Class property_get_array_class(objc_property_t prop) {
 /**
     获取 @property (nonatomic) SubTestObject *sub 结果为：\c SubTestObject
  */
-Class property_get_object_class(objc_property_t prop) {
+Class property_get_property_class(objc_property_t prop) {
     const char *v = property_copyAttributeValue(prop, "T");
     char *sub = str_sub(v, '"', '"');
     Class cls = objc_getClass(sub);

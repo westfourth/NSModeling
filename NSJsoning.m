@@ -38,7 +38,7 @@
     return self;
 }
 
-- (instancetype)fromJsonFile:(NSString *)filename inBundle:(nullable NSBundle *)bundle {
+- (instancetype)fromJsonFilename:(NSString *)filename bundle:(nullable NSBundle *)bundle {
     bundle = bundle ? bundle : [NSBundle mainBundle];
     NSString *path = [bundle pathForResource:filename ofType:nil];
     NSData *data = [NSData dataWithContentsOfFile:path];
@@ -75,7 +75,7 @@
     return list;
 }
 
-+ (nullable NSArray *)fromJsonFile:(NSString *)filename inBundle:(nullable NSBundle *)bundle {
++ (nullable NSArray *)fromJsonFilename:(NSString *)filename bundle:(nullable NSBundle *)bundle {
     bundle = bundle ? bundle : [NSBundle mainBundle];
     NSString *path = [bundle pathForResource:filename ofType:nil];
     NSData *data = [NSData dataWithContentsOfFile:path];
