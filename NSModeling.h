@@ -2,7 +2,7 @@
 //  NSModeling.h
 //  Markdown
 //
-//  Created by xisi on 2021/12/19.
+//  Created by hanxin on 2021/12/19.
 //
 
 #import <Foundation/Foundation.h>
@@ -12,6 +12,24 @@
 #define MODEL_SET(name)     - (id)name##ModelSetter:(id)value
 //! 模型 --> 字典
 #define MODEL_GET(name)     - (id)name##ModelGetter:(id)value
+
+
+//! 枚举互转
+#define MODEL_ENUM(name, dict) \
+MODEL_SET(state) { \
+    return dict[value]; \
+} \
+\
+MODEL_GET(state) { \
+    __block NSString *str = nil; \
+    [dict enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) { \
+        if ([obj isEqual:value]) { \
+            *stop = YES; \
+            str = key; \
+        } \
+    }]; \
+    return str; \
+}
 
 
 NS_ASSUME_NONNULL_BEGIN

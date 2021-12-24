@@ -23,6 +23,9 @@
 | **transformer** | 不支持 | 不支持 | 支持 | 不支持 |
 | **getter、setter** | 不支持 | 支持 | 不支持 | 支持 |
 
+# 设计
+
+![method_sequence](method_sequence.png)
 
 ## 举例
 
@@ -67,7 +70,9 @@
 @end
 ```
 
-## 基本使用
+# 使用
+
+## 1. 字典
 
 **采用`NSJsoning`协议即可**
 
@@ -95,7 +100,23 @@
     TestObject *t3 = [[TestObject alloc] fromJsonString:text];
 ```
 
-## 嵌套模型
+## 2. 数组 
+
+``` objc
+    TestObject *t1 =  [TestObject new];
+    t1.name = @"AAA";
+    t1.age = 123;
+    
+    TestObject *t2 =  [TestObject new];
+    t2.name = @"AAA";
+    t2.age = 123;
+    
+    NSArray *array1 = [t1, t2];
+    NSArray<NSDictionary *> *array2 = [TestObject toDict:array1];
+    NSArray<TestObject *> *array3 = [TestObject fromDict:array2];
+```
+
+## 3. 嵌套字典
 
 嵌套子模型也采用`NSJsoning`协议即可
 
@@ -106,7 +127,7 @@
 
 ```
 
-## 数组
+## 4. 嵌套数组
 
 使用`protocol`声明数组元素的类型即可
 
@@ -123,7 +144,7 @@
 
 ```
 
-## 属性映射
+## 5. 属性映射
 
 实现`+ (NSDictionary *)dictMapper`即可
 
@@ -141,9 +162,15 @@
 
 [Mantle](https://github.com/Mantle/Mantle)、[jsonmodel](https://github.com/jsonmodel/jsonmodel)、[MJExtension](https://github.com/CoderMJLee/MJExtension) 都支持多级属性映射（`valueForKeyPath:`），[NSModeling](https://github.com/westfourth/NSModeling) 特意去掉多级属性映射（`valueForKey:`）。**原因是在实际开发过程中，多级属性映射易造成模型混乱**，去掉多级属性映射，让模型跟后台接口数据结构保持一致。
 
-## 自定义getter、setter
+## 6. 忽略属性
 
-![method_sequence](method_sequence.png)
+``` objc
++ (NSArray<NSString *> *)ignoreProperties {
+    return @[@"age"];
+}
+```
+
+## 7. 自定义getter、setter
 
 ``` objc
 @implementation TestObject
@@ -179,7 +206,7 @@ MODEL_GET(date) {
 @end
 ```
 
-## `NSNull`、`NSURL`、`NSDate`自动转换
+## 8. `NSNull`、`NSURL`、`NSDate`自动转换
 
 ``` objc
 @implementation TestObject
@@ -202,6 +229,15 @@ MODEL_GET(date) {
 @end
 ```
 
-##优先级
+## 9. enum枚举
 
-`自定义getter、setter` > `automaticXXX方法` > `NSModelConfig全局配置`
+``` objc
+MODEL_ENUM(state, (@{@"open": @(GTIssuesStateOpen),
+                     @"close": @(GTIssuesStateClose)
+                   }))
+```
+
+
+# 优先级
+
+`MODEL_SET`、`MODEL_GET` **>** `automaticXXX方法` **>** `NSModelConfig全局配置`

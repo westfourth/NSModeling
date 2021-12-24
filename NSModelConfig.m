@@ -2,7 +2,7 @@
 //  NSModelConfig.m
 //  Markdown
 //
-//  Created by xisi on 2021/12/22.
+//  Created by hanxin on 2021/12/22.
 //
 
 #import "NSModelConfig.h"

@@ -2,7 +2,7 @@
 //  NSModeling.m
 //  Markdown
 //
-//  Created by xisi on 2021/12/19.
+//  Created by hanxin on 2021/12/19.
 //
 
 #import "NSModeling.h"
@@ -161,6 +161,7 @@ static id to_dict_value(id self, const char *name, Class cls, id value) {
                 value = nil;
             }
         }
+        
         //
         if (cls == [NSURL class]) {             //  NSURL处理
             if ([[self class] respondsToSelector:@selector(automaticURL)]) {
@@ -183,6 +184,11 @@ static id to_dict_value(id self, const char *name, Class cls, id value) {
                 }
             } else if (NSModelConfig.share.automaticDate) {
                 value = [df stringFromDate:(NSDate *)value];
+            }
+        } else if (cls == NULL) {
+            //  当为数字类型时，setNilValueForKey: 崩溃
+            if (value == nil) {
+                value = @0;
             }
         }
     }
@@ -237,6 +243,11 @@ static id from_dict_value(id self, const char *name, Class cls, id value) {
                 }
             } else if (NSModelConfig.share.automaticDate) {
                 value = [df dateFromString:(NSString *)value];
+            }
+        } else if (cls == NULL) {
+            //  当为数字类型时，setNilValueForKey: 崩溃
+            if (value == nil) {
+                value = @0;
             }
         }
     }
