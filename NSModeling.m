@@ -185,12 +185,11 @@ static id to_dict_value(id self, const char *name, Class cls, id value) {
             } else if (NSModelConfig.share.automaticDate) {
                 value = [df stringFromDate:(NSDate *)value];
             }
-        } else if (cls == NULL) {
-            //  当为数字类型时，setNilValueForKey: 崩溃
-            if (value == nil) {
-                value = @0;
-            }
         }
+    }
+    //  当为数字类型时，setNilValueForKey: 崩溃
+    if (value == nil && cls == NULL) {
+        value = @0;
     }
     return value;
 }
@@ -244,12 +243,11 @@ static id from_dict_value(id self, const char *name, Class cls, id value) {
             } else if (NSModelConfig.share.automaticDate) {
                 value = [df dateFromString:(NSString *)value];
             }
-        } else if (cls == NULL) {
-            //  当为数字类型时，setNilValueForKey: 崩溃
-            if (value == nil) {
-                value = @0;
-            }
         }
+    }
+    //  当为数字类型时，setNilValueForKey: 崩溃
+    if (value == nil && cls == NULL) {
+        value = @0;
     }
     return value;
 }
